@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Joël Porquet" />
+  <title>ECS 150: Project #1 - Simple shell</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link href="data:text/css;charset=utf-8,%2Ehll%20%7B%20background%2Dcolor%3A%20%23ffffcc%20%7D%0A%2Ec%20%7B%20color%3A%20%23408080%3B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Eerr%20%7B%20border%3A%201px%20solid%20%23FF0000%20%7D%20%0A%2Ek%20%7B%20color%3A%20%23008000%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Eo%20%7B%20color%3A%20%23666666%20%7D%20%0A%2Ech%20%7B%20color%3A%20%23408080%3B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Ecm%20%7B%20color%3A%20%23408080%3B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Ecp%20%7B%20color%3A%20%23BC7A00%20%7D%20%0A%2Ecpf%20%7B%20color%3A%20%23408080%3B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Ec1%20%7B%20color%3A%20%23408080%3B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Ecs%20%7B%20color%3A%20%23408080%3B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Egd%20%7B%20color%3A%20%23A00000%20%7D%20%0A%2Ege%20%7B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Egr%20%7B%20color%3A%20%23FF0000%20%7D%20%0A%2Egh%20%7B%20color%3A%20%23000080%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Egi%20%7B%20color%3A%20%2300A000%20%7D%20%0A%2Ego%20%7B%20color%3A%20%23888888%20%7D%20%0A%2Egp%20%7B%20color%3A%20%23000080%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Egs%20%7B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Egu%20%7B%20color%3A%20%23800080%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Egt%20%7B%20color%3A%20%230044DD%20%7D%20%0A%2Ekc%20%7B%20color%3A%20%23008000%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Ekd%20%7B%20color%3A%20%23008000%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Ekn%20%7B%20color%3A%20%23008000%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Ekp%20%7B%20color%3A%20%23008000%20%7D%20%0A%2Ekr%20%7B%20color%3A%20%23008000%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Ekt%20%7B%20color%3A%20%23B00040%20%7D%20%0A%2Em%20%7B%20color%3A%20%23666666%20%7D%20%0A%2Es%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Ena%20%7B%20color%3A%20%237D9029%20%7D%20%0A%2Enb%20%7B%20color%3A%20%23008000%20%7D%20%0A%2Enc%20%7B%20color%3A%20%230000FF%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Eno%20%7B%20color%3A%20%23880000%20%7D%20%0A%2End%20%7B%20color%3A%20%23AA22FF%20%7D%20%0A%2Eni%20%7B%20color%3A%20%23999999%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Ene%20%7B%20color%3A%20%23D2413A%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Enf%20%7B%20color%3A%20%230000FF%20%7D%20%0A%2Enl%20%7B%20color%3A%20%23A0A000%20%7D%20%0A%2Enn%20%7B%20color%3A%20%230000FF%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Ent%20%7B%20color%3A%20%23008000%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Env%20%7B%20color%3A%20%2319177C%20%7D%20%0A%2Eow%20%7B%20color%3A%20%23AA22FF%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Ew%20%7B%20color%3A%20%23bbbbbb%20%7D%20%0A%2Emb%20%7B%20color%3A%20%23666666%20%7D%20%0A%2Emf%20%7B%20color%3A%20%23666666%20%7D%20%0A%2Emh%20%7B%20color%3A%20%23666666%20%7D%20%0A%2Emi%20%7B%20color%3A%20%23666666%20%7D%20%0A%2Emo%20%7B%20color%3A%20%23666666%20%7D%20%0A%2Esa%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Esb%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Esc%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Edl%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Esd%20%7B%20color%3A%20%23BA2121%3B%20font%2Dstyle%3A%20italic%20%7D%20%0A%2Es2%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Ese%20%7B%20color%3A%20%23BB6622%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Esh%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Esi%20%7B%20color%3A%20%23BB6688%3B%20font%2Dweight%3A%20bold%20%7D%20%0A%2Esx%20%7B%20color%3A%20%23008000%20%7D%20%0A%2Esr%20%7B%20color%3A%20%23BB6688%20%7D%20%0A%2Es1%20%7B%20color%3A%20%23BA2121%20%7D%20%0A%2Ess%20%7B%20color%3A%20%2319177C%20%7D%20%0A%2Ebp%20%7B%20color%3A%20%23008000%20%7D%20%0A%2Efm%20%7B%20color%3A%20%230000FF%20%7D%20%0A%2Evc%20%7B%20color%3A%20%2319177C%20%7D%20%0A%2Evg%20%7B%20color%3A%20%2319177C%20%7D%20%0A%2Evi%20%7B%20color%3A%20%2319177C%20%7D%20%0A%2Evm%20%7B%20color%3A%20%2319177C%20%7D%20%0A%2Eil%20%7B%20color%3A%20%23666666%20%7D%20%0A" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title">ECS 150: Project #1 - Simple shell</h1>
+<h2 class="author">Joël Porquet</h2>
+<h3 class="date">UC Davis, Winter Quarter 2017, version 1.7</h3>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#changelog">Changelog</a></li>
+<li><a href="#general-information">General information</a></li>
+<li><a href="#specifications">Specifications</a><ul>
+<li><a href="#introduction">Introduction</a><ul>
+<li><a href="#constraints">Constraints</a></li>
+</ul></li>
+<li><a href="#phase-0-preliminary-work">Phase 0: preliminary work</a><ul>
+<li><a href="#understand-the-code">0.1 Understand the code</a></li>
+<li><a href="#makefile">0.2 Makefile</a></li>
+</ul></li>
+<li><a href="#phase-1-running-commands-the-hard-way">Phase 1: running commands the hard way</a></li>
+<li><a href="#phase-2-read-commands-from-the-input">Phase 2: read commands from the input</a><ul>
+<li><a href="#error-management">Error management</a></li>
+</ul></li>
+<li><a href="#phase-3-arguments">Phase 3: arguments</a></li>
+<li><a href="#phase-4-builtin-commands">Phase 4: builtin commands</a><ul>
+<li><a href="#exit"><code>exit</code></a></li>
+<li><a href="#cd-and-pwd"><code>cd</code> and <code>pwd</code></a></li>
+</ul></li>
+<li><a href="#phase-5-input-redirection">Phase 5: Input redirection</a></li>
+<li><a href="#phase-6-output-redirection">Phase 6: Output redirection</a></li>
+<li><a href="#phase-7-pipeline-commands">Phase 7: Pipeline commands</a></li>
+<li><a href="#phase-8-background-commands">Phase 8: Background commands</a></li>
+</ul></li>
+<li><a href="#deliverable">Deliverable</a><ul>
+<li><a href="#content">Content</a></li>
+<li><a href="#git">Git</a></li>
+<li><a href="#handin">Handin</a></li>
+</ul></li>
+<li><a href="#academic-integrity">Academic integrity</a></li>
+</ul>
+</div>
+<h1 id="changelog">Changelog</h1>
+<ul>
+<li>v1.7: Fix due date</li>
+<li>v1.6: Introduce changelog section</li>
+<li>v1.5: Phase 2 - <em>Fix output of shell example (&quot;command not found&quot; example)</em></li>
+<li>v1.4: Introduction - <em>Remove mention of history management</em></li>
+<li>v1.3: Phase 7 - <em>Fix typo (in pipeline of commands, only last command can have its output redirected)</em></li>
+<li>v1.2: Phase 2 - <em>Fix typo (&quot;command not found&quot; error message)</em></li>
+<li>v1.1: General info - <em>Update due date</em></li>
+</ul>
+<h1 id="general-information">General information</h1>
+<p>Due before <strong>11:59 PM, Tuesday, April 18th, 2017</strong>.</p>
+<p>You will be working with a partner for this project.</p>
+<p>The reference work environment is the CSIF.</p>
+<h1 id="specifications">Specifications</h1>
+<p><em>Note that the specifications for this project are subject to change at anytime for additional clarification. Make sure to always refer to the latest version.</em></p>
+<h2 id="introduction">Introduction</h2>
+<p>The goal of this project is to understand important UNIX system calls by implementing a simple shell called <strong>sshell</strong>. A shell is a command-line interpreter: it accepts input from the user under the form of command lines and executes them.</p>
+<p>In the following example, it is the shell that is in charge of printing the <em>shell prompt</em>, understanding the supplied command line (redirect the output of executable program <code>ls</code> with the argument <code>-l</code> to the input of executable program <code>cat</code>), execute it and wait for it to finish before prompting the user for a new command line.</p>
+<div class="highlight"><pre><span></span><span class="gp">jporquet@pc10:~/ecs150 %</span> ls -l <span class="p">|</span> cat
+<span class="go">total 12K</span>
+<span class="go">-rw------- 1 jporquet users 11K 2017-04-04 11:27 ASSIGNMENT.md</span>
+<span class="gp">jporquet@pc10:~/ecs150 %</span>
+</pre></div>
+
+<p>Similar to well-known shells such as <em>bash</em> or <em>zsh</em>, your shell will be able to:</p>
+<ol style="list-style-type: decimal">
+<li>execute user-supplied commands with optional arguments</li>
+<li>offer a selection of builtin commands</li>
+<li>redirect the standard input or standard output of commands to files</li>
+<li>pipe the output of commands to other commands</li>
+<li>put commands in the background</li>
+</ol>
+<p>A working example of the simple shell can be found on the CSIF, at <code>/home/jporquet/ecs150/sshell_ref</code>.</p>
+<h3 id="constraints">Constraints</h3>
+<p>The shell must be written in C, be compiled with GCC and only use the standard functions provided by the <a href="https://www.gnu.org/software/libc/manual/">GNU C Library</a> (aka <code>libc</code>). <em>All</em> the functions provided by the <code>libc</code> can be used, but your program cannot be linked to any other external libraries.</p>
+<p>Your source code should follow the relevant parts of the <a href="https://www.kernel.org/doc/html/latest/process/coding-style.html">Linux kernel coding style</a> and be properly commented.</p>
+<h2 id="phase-0-preliminary-work">Phase 0: preliminary work</h2>
+<p>In this preliminary phase, copy the skeleton C file <code>/home/jporquet/ecs150/sshell.c</code> to your directory. Compile it into an executable <code>sshell</code> and run it.</p>
+<div class="highlight"><pre><span></span><span class="gp">jporquet@pc10:~/ %</span> ./sshell
+<span class="go">...</span>
+</pre></div>
+
+<p>What does it do?</p>
+<h3 id="understand-the-code">0.1 Understand the code</h3>
+<p>Open the C file <code>sshell.c</code> and read the code. As you can notice, we use the function <code>system()</code> to run the command <code>/usr/bin/date -u</code> (which displays the current time in UTC format) and print the <em>raw</em> status value that the command returned to the standard output (<code>stdin</code>).</p>
+<p>The problem is that <code>system()</code> is too high-level to use for implementing a realistic shell. For example, it doesn't let you redirect the input or output, or run commands in the background.</p>
+<p>Useful resources for this phase:</p>
+<ul>
+<li><a href="http://man7.org/linux/man-pages/man3/system.3.html" class="uri">http://man7.org/linux/man-pages/man3/system.3.html</a></li>
+<li><a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Running-a-Command" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Running-a-Command</a></li>
+</ul>
+<h3 id="makefile">0.2 Makefile</h3>
+<p>Write a simple Makefile that generates an executable <code>sshell</code> from the file <code>sshell.c</code>, using GCC.</p>
+<p>The compiler should be run with the <code>-Wall</code> and <code>-Werror</code> options.</p>
+<p>There should also be a <code>clean</code> rule that removes any generated files and puts the directory back in its original state.</p>
+<p>Useful resources for this phase:</p>
+<ul>
+<li><a href="https://www.gnu.org/software/make/manual/make.html" class="uri">https://www.gnu.org/software/make/manual/make.html</a></li>
+<li><a href="https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html" class="uri">https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html</a></li>
+</ul>
+<h2 id="phase-1-running-commands-the-hard-way">Phase 1: running commands the hard way</h2>
+<p>Instead of using the function <code>system()</code>, modify the program in order to use the <em>fork+exec+wait</em> method.</p>
+<p>In a nutshell, your shell should fork and create a child process; the child process should run the specified command with exec while the parent process waits until the child process has completed and the parent can collect its exit status.</p>
+<p>The output of the program execution should be as follows.</p>
+<div class="highlight"><pre><span></span><span class="gp">jporquet@pc10:~/ %</span> ./sshell
+<span class="go">Tue Apr  4 21:12:18 UTC 2017</span>
+<span class="go">+ completed '/usr/bin/date -u' [0]</span>
+<span class="gp">jporquet@pc10:~/ %</span>
+</pre></div>
+
+<p>There are a couple of non-apparent differences between this output and the output of the provided skeleton code:</p>
+<ul>
+<li><p>The information message following the execution of the command is printed to <code>stderr</code> and not <code>stdout</code>.</p>
+<p>This can be verified by redirecting the error output to <code>/dev/null</code> and checking that the information message is not printed anymore:</p>
+<div class="highlight"><pre><span></span><span class="gp">jporquet@pc10:~/ %</span> ./sshell <span class="m">2</span>&gt;/dev/null
+<span class="go">Tue Apr  4 21:12:18 UTC 2017</span>
+<span class="gp">jporquet@pc10:~/ %</span>
+</pre></div>
+</li>
+<li><p>The printed status (i.e. <code>0</code> in the example above) is not the full <em>raw</em> status value anymore, it is the <em>exit</em> status only. Refer to the <em>Process Completion Status</em> section of the <code>libc</code> documentation to understand how to extract this value.</p></li>
+</ul>
+<p>Useful resources for this phase: <a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Processes" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Processes</a></p>
+<h2 id="phase-2-read-commands-from-the-input">Phase 2: read commands from the input</h2>
+<p>Until now, your program is only running a hard-coded command. In order to be interactive, the shell should instead read commands from the user and execute them.</p>
+<p>In this phase, modify your shell in order to print the <em>shell prompt</em> '<code>sshell$</code> ' (without the quotes but with the trailing white space) and read a complete command line from the user. We assume that the maximum length of a command line never exceeds 512 characters.</p>
+<p>Since it would be annoying for the user to always type the complete paths of the commands to execute (e.g. <code>/usr/bin/ls</code>), programs should be searched according to the <a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Standard-Environment"><code>$PATH</code> environment variable</a>. For that, you need to carefully choose which of the <code>exec</code> functions should be used.</p>
+<p>For this phase, you can assume that the user can only enter the name of a program (e.g. <code>ls</code>, <code>ps</code>, <code>date</code>, etc.) without any argument.</p>
+<p>Example of output:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ date</span>
+<span class="go">Tue Apr  4 14:09:08 PDT 2017</span>
+<span class="go">+ completed 'date' [0]</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>Useful resources for this phase:</p>
+<ul>
+<li><a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Line-Input" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Line-Input</a></li>
+<li><a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Executing-a-File" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Executing-a-File</a></li>
+</ul>
+<h3 id="error-management">Error management</h3>
+<p>In case of user errors (e.g. invalid input, command not found, etc.), the shell should display a meaningful error message on <code>stderr</code> and wait for the next input, but it should <strong>not</strong> die.</p>
+<p>Example of a command not found:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ toto</span>
+<span class="go">Error: command not found</span>
+<span class="go">+ completed 'toto' [1]</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>The only reason for which the shell is allowed to die (with an exit value of <code>1</code>) is if a system call actually fails. For example, <code>malloc()</code> fails to allocate memory or <code>fork()</code> fails to spawn a child.</p>
+<h2 id="phase-3-arguments">Phase 3: arguments</h2>
+<p>In this phase, you must add to your shell the ability to handle command lines containing programs and their arguments.</p>
+<p>A command is then defined as the name of a program, followed by optional arguments, each separated by white spaces (at least one, but can also be more than one). In order to simplify your implementation, you can assume that a command will never have more than 16 arguments (name of the program included).</p>
+<p>For this phase, you will need to start <em>parsing</em> the command line in order to interpret what needs to be run. Refer to the <code>libc</code> documentation to learn more about strings in C (and particularly sections 5.1, 5.3, 5.4, 5.7 and 5.10): <a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#String-and-Array-Utilities" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#String-and-Array-Utilities</a></p>
+<p>Example of commands which include arguments (with more or less white spaces separating arguments):</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ date -u</span>
+<span class="go">Tue Apr  4 22:07:03 UTC 2017</span>
+<span class="go">+ completed 'date -u' [0]</span>
+<span class="go">sshell$ date                      -u</span>
+<span class="go">Tue Apr  4 22:46:41 UTC 2017</span>
+<span class="go">+ completed 'date                      -u' [0]</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>At this point, and if you have not already, it probably is the right time to think of how you could represent commands using a data structure. After all, a <code>struct</code> object in C is nothing different than a C++/Java class without methods. But such an object can still contain fields that contain the object's properties, and C++-like methods can be implemented as simple functions that receive objects as parameters.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="cm">/* C++ class */</span>
+<span class="k">class</span> <span class="nc">myclass</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+
+    <span class="n">mymethod</span><span class="p">(</span><span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="cm">/* Equivalent in C */</span>
+<span class="k">struct</span> <span class="n">myobj</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">myfunc</span><span class="p">(</span><span class="k">struct</span> <span class="n">myobj</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">obj</span><span class="o">-&gt;</span><span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Hint: the result of parsing the command line should be the instance of a data structure which contains all the information necessary to run the specified command.</p>
+<h2 id="phase-4-builtin-commands">Phase 4: builtin commands</h2>
+<p>Usually, when a user enters a command, the related program is an <em>external</em> executable file. For example, <code>ls</code> refers to the executable file <code>/usr/bin/ls</code> while <code>ip</code> refers to <code>/usr/sbin/ip</code>.</p>
+<p>For some commands, it is preferable that the shell itself implements the command instead of running an external program. In this phase, your shell must implement the commands <code>exit</code>, <code>cd</code> and <code>pwd</code>.</p>
+<p>For simplicity, you can assume that these builtin commands will never be called with incorrect arguments (i.e. no arguments for <code>exit</code> and <code>pwd</code> and exactly one argument for <code>cd</code>).</p>
+<h3 id="exit"><code>exit</code></h3>
+<p>Receiving the builtin command <code>exit</code> should cause the shell to exit properly (i.e. with exit status <code>0</code>). Before exiting, the shell must print the message '<code>Bye...</code>' on <code>stderr</code>.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="gp">jporquet@pc10:~/ %</span> ./sshell
+<span class="go">sshell$ exit</span>
+<span class="go">Bye...</span>
+<span class="gp">jporquet@pc10:~/ %</span> <span class="nb">echo</span> <span class="nv">$?</span>
+<span class="go">0</span>
+</pre></div>
+
+<h3 id="cd-and-pwd"><code>cd</code> and <code>pwd</code></h3>
+<p>The user can change the <em>current working directory</em> (i.e. the directory the shell is currently &quot;in&quot;) with <code>cd</code> or display it with <code>pwd</code>.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ pwd</span>
+<span class="go">/home/jporquet/ecs150</span>
+<span class="go">+ completed 'pwd' [0]</span>
+<span class="go">sshell$ cd ..</span>
+<span class="go">+ completed 'cd ..' [0]</span>
+<span class="go">sshell$ pwd</span>
+<span class="go">/home/jporquet</span>
+<span class="go">+ completed 'pwd' [0]</span>
+<span class="go">sshell$ cd toto</span>
+<span class="go">Error: no such directory</span>
+<span class="go">+ completed 'cd toto' [1]</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>Useful resources for this phase: <a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Working-Directory" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Working-Directory</a></p>
+<h2 id="phase-5-input-redirection">Phase 5: Input redirection</h2>
+<p>The standard input redirection is indicated by using the meta-character <code>&lt;</code> followed by a file name. Such redirection implies that the command located right before <code>&lt;</code> is to read its input from the specified file instead of the shell's standard input (that is from the keyboard if the shell is run in a terminal).</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ cat file</span>
+<span class="go">titi</span>
+<span class="go">toto</span>
+<span class="go">+ completed 'cat file' [0]</span>
+<span class="go">sshell$ grep toto&lt;file</span>
+<span class="go">toto</span>
+<span class="go">+ completed 'grep toto&lt;file' [0]</span>
+<span class="go">sshell$ grep toto &lt; tata</span>
+<span class="go">Error: cannot open input file</span>
+<span class="go">sshell$ cat &lt;</span>
+<span class="go">Error: no input file</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>Note that the input redirection symbol can or not be surrounded by white spaces.</p>
+<h2 id="phase-6-output-redirection">Phase 6: Output redirection</h2>
+<p>The standard output redirection is indicated by using the meta-character <code>&gt;</code> followed by a file name. Such redirection implies that the command located right before <code>&gt;</code> is to write its output to the specified file instead of the shell's standard output (that is on the screen if the shell is run in a terminal).</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ echo Hello world!&gt;file</span>
+<span class="go">+ completed 'echo Hello world!&gt;file' [0]</span>
+<span class="go">sshell$ cat file</span>
+<span class="go">Hello world!</span>
+<span class="go">+ completed 'cat file' [0]</span>
+<span class="go">sshell$ echo hack &gt; /etc/passwd</span>
+<span class="go">Error: cannot open output file</span>
+<span class="go">sshell$ echo &gt;</span>
+<span class="go">Error: no output file</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>Note that the output redirection symbol can or not be surrounded by white spaces.</p>
+<h2 id="phase-7-pipeline-commands">Phase 7: Pipeline commands</h2>
+<p>So far, a command line could only be composed of one command (name of program and optional arguments). In this phase, we introduce the notion of pipeline of commands.</p>
+<p>The pipe sign is indicated by the meta-character <code>|</code> and allows multiple commands to be connected to each other. When the shell encounters a pipe sign, it indicates that the output of the command located before the pipe sign must be connected to the input of the command located after the pipe sign. There can be multiple pipe signs on the same command line to connect multiple commands to each other.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ echo Hello world! | grep Hello|wc -l</span>
+<span class="go">1</span>
+<span class="go">+ completed 'echo Hello world! | grep Hello|wc -l' [0][0][0]</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>Note that there is no limit on the number of commands part of a pipeline as long as it fits into the command line (i.e. 512 characters).</p>
+<p>The information message must display the exit value of each command composing the pipeline separately. This means that commands can have different exit values as shown in the example below (the first command succeeds while the second command fails with exit value 2).</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ echo hello | ls file_that_doesnt_exists</span>
+<span class="go">ls: cannot access 'file_that_doesnt_exists': No such file or directory</span>
+<span class="go">+ completed 'echo hello | ls file_that_doesnt_exists' [0][2]</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>In a pipeline of commands, only the first command can have its input redirected and only the last command can have its output redirected.</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ cat file | grep toto &lt; file</span>
+<span class="go">Error: mislocated input redirection</span>
+<span class="go">sshell$ echo Hello world! &gt; file | cat file</span>
+<span class="go">Error: mislocated output redirection</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>Hint: for this phase, you will probably need to think of a data structure that can be used to represent a job (i.e. a pipeline of one or more commands).</p>
+<p>Useful resources for this phase (sections 15.1 and 15.2): <a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Pipes-and-FIFOs" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Pipes-and-FIFOs</a></p>
+<h2 id="phase-8-background-commands">Phase 8: Background commands</h2>
+<p>Up until now, when the user enters a command line and the shell executes it, the shell waits until the specified job is completed before it displays the prompt again and is able to accept a new command line to be supplied.</p>
+<p>The ampersand character <code>&amp;</code> indicates that the specified job should be executed in the background. In that case, the shell should not wait for the job's completion but immediately display the prompt and allow for a new command line to be entered. The background sign may only appear as the last token of a command line.</p>
+<p>When a background job finally completes, the shell should display the exit status of all the job's commands right before a new prompt is being displayed.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ sleep 1&amp;</span>
+<span class="go">sshell$ sleep 5</span>
+<span class="go">+ completed 'sleep 1&amp;' [0]</span>
+<span class="go">+ completed 'sleep 5' [0]</span>
+<span class="go">sshell$ echo &gt; file &amp; | grep toto</span>
+<span class="go">Error: mislocated background sign</span>
+<span class="go">sshell$</span>
+</pre></div>
+
+<p>Trying to exit while there are still running jobs in the background should be considered a user error.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><span class="go">sshell$ sleep 5&amp;</span>
+<span class="go">sshell$ exit</span>
+<span class="go">Error: active jobs still running</span>
+<span class="go">+ completed 'exit' [1]</span>
+<span class="go">sshell$ &lt;Return&gt;</span>
+<span class="go">... more than 5 seconds later ...</span>
+<span class="go">sshell$ &lt;Return&gt;</span>
+<span class="go">+ completed 'sleep 5&amp;' [0]</span>
+<span class="go">sshell$ exit</span>
+<span class="go">Bye...</span>
+</pre></div>
+
+<p>Useful resources for this phase: <a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Process-Completion" class="uri">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Process-Completion</a></p>
+<h1 id="deliverable">Deliverable</h1>
+<h2 id="content">Content</h2>
+<p>Your submission should contain, besides your source code, the following files:</p>
+<ul>
+<li><p><code>AUTHORS</code>: first name, last name, student ID and email of each partner, one entry per line formatted in CSV (fields are separated with commas). For example:</p>
+<div class="highlight"><pre><span></span><span class="gp">$</span> cat AUTHORS
+<span class="go">Homer,Simpson,00010001,hsimpson@ucdavis.edu</span>
+<span class="go">Robert David,Martin,00010002,rdmartin@ucdavis.edu</span>
+</pre></div>
+</li>
+<li><p><code>REPORT.md</code>: a description of your submission. Your report must respect the following rules:</p>
+<ul>
+<li><p>It must be formatted in markdown language as described in this <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown-Cheatsheet</a>.</p></li>
+<li><p>It should contain no more than 300 lines and the maximum width for each line should be 80 characters (check your editor's settings to configure that).</p></li>
+<li><p>It should explain your high-level design choices, details about the relevant parts of your implementation, how you tested your project, the sources that you may have used to complete this project, and any other information that can help understanding your code.</p></li>
+<li><p>Keep in mind that the goal of this report is not to paraphrase the assignment, but to explain how you implemented it.</p></li>
+</ul></li>
+<li><p><code>Makefile</code>: a Makefile that compiles your source code without any errors or warnings (on the CSIF computers), and builds an executable named <code>sshell</code>.</p>
+<p>The compiler should be run with the options <code>-Wall -Werror</code>.</p>
+<p>There should also be a <code>clean</code> rule that removes generated files and puts the directory back in its original state.</p></li>
+</ul>
+<p>Your submission should be empty of any clutter files such as executable files, core dumps, etc.</p>
+<h2 id="git">Git</h2>
+<p>Your submission must be under the shape of a Git bundle. In your git repository, type in the following command (your work must be in the branch <code>master</code>):</p>
+<div class="highlight"><pre><span></span><span class="gp">$</span> git bundle create sshell.bundle master
+</pre></div>
+
+<p>It should create the file <code>sshell.bundle</code> that you will submit via <code>handin</code>.</p>
+<p>You can make sure that your bundle has properly been packaged by extracting it in another directory and verifying the log:</p>
+<div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">cd</span> /path/to/tmp/dir
+<span class="gp">$</span> git clone /path/to/sshell.bundle -b master sshell
+<span class="gp">$</span> <span class="nb">cd</span> sshell
+<span class="gp">$</span> ls -l
+<span class="go">...</span>
+<span class="gp">$</span> git log
+<span class="go">...</span>
+</pre></div>
+
+<h2 id="handin">Handin</h2>
+<p>Your Git bundle, as created above, is to be submitted with <code>handin</code> from one of the CSIF computers:</p>
+<div class="highlight"><pre><span></span><span class="gp">$</span> handin cs150 p1 sshell.bundle
+<span class="go">Submitting sshell.bundle... ok</span>
+<span class="gp">$</span>
+</pre></div>
+
+<p>You can verify that the bundle has been properly submitted:</p>
+<div class="highlight"><pre><span></span><span class="gp">$</span> handin cs150 p1
+<span class="go">The following input files have been received:</span>
+<span class="go">...</span>
+<span class="gp">$</span>
+</pre></div>
+
+<h1 id="academic-integrity">Academic integrity</h1>
+<p>You are expected to write this project from scratch, thus avoiding to use any existing source code available on the Internet. You must specify in your <code>REPORT.md</code> file any sources of code that you or your partner have viewed to help you complete this project. All class projects will be submitted to MOSS to determine if pairs of students have excessively collaborated with other pairs, or have used the work of past students.</p>
+<p>Excessive collaboration, or failure to list external code sources will result in the matter being transferred to Student Judicial Affairs.</p>
+</body>
+</html>
